@@ -19,5 +19,5 @@ yarn-error.log
 /_bmad
 /_bmad-output
 /architecture.md
-/storage/framework/views
-/storage/logs
+/storage/framework/views/*.php
+/storage/logs/*.log
