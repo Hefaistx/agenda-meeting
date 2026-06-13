@@ -24,35 +24,6 @@
              @time-changed.window="onTimeChanged($event.detail)"
              @pic-internal-changed.window="onPicChanged($event.detail)">
 
-            {{-- Conflict Warning --}}
-            <template x-if="hasConflicts">
-                <div class="alert mb-3 py-2" style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px">
-                    <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Peringatan Konflik Jadwal
-                    </div>
-                    <template x-if="conflicts.room_conflict">
-                        <div style="font-size:12px;color:#78350f;margin-bottom:2px">
-                            <i class="bi bi-door-open me-1"></i>
-                            Ruangan sudah digunakan:
-                            <strong x-text="conflicts.room_conflict.meeting_code"></strong>
-                            (<span x-text="conflicts.room_conflict.jam"></span>)
-                            — <span x-text="conflicts.room_conflict.kegiatan" style="font-style:italic"></span>
-                        </div>
-                    </template>
-                    <template x-for="p in (conflicts.pic_conflicts || [])" :key="p.name">
-                        <div style="font-size:12px;color:#78350f">
-                            <i class="bi bi-person-fill-exclamation me-1"></i>
-                            <strong x-text="p.name"></strong> sudah ada jadwal:
-                            <span x-text="p.meeting_code" style="font-family:monospace;font-size:11px"></span>
-                            (<span x-text="p.jam"></span>)
-                        </div>
-                    </template>
-                    <div style="font-size:11px;color:#a16207;margin-top:4px">
-                        <i class="bi bi-info-circle me-1"></i>Agenda tetap bisa disimpan meski ada konflik.
-                    </div>
-                </div>
-            </template>
-
             <form method="POST" action="{{ route('agenda.store') }}" @submit.prevent="handleSubmit($event)">
                 @csrf
                 <div class="row g-3">
