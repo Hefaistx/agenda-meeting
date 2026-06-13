@@ -78,17 +78,25 @@ class KalenderController extends Controller
                 });
             }
         }
+        $picExtNames = [];
         if ($picExt = $request->get('pic_external')) {
-            $pics = array_filter(array_map('trim', explode(',', $picExt)));
-            if ($pics) {
-                $tableData = $tableData->filter(function ($m) use ($pics) {
-                    $stored = strtolower($m->pic_external ?? '');
-                    foreach ($pics as $p) {
-                        if (str_contains($stored, strtolower($p))) return true;
-                    }
-                    return false;
-                });
+            $picExtNames = array_filter(array_map('trim', explode(',', $picExt)));
+        }
+        if (empty($picExtNames) && ($divisiExt = $request->get('divisi_ext'))) {
+            $divCodes = array_filter(array_map('trim', explode(',', $divisiExt)));
+            foreach ($divCodes as $code) {
+                $members = array_keys(Meeting::$externalDivisions[$code]['members'] ?? []);
+                $picExtNames = array_merge($picExtNames, $members);
             }
+        }
+        if ($picExtNames) {
+            $tableData = $tableData->filter(function ($m) use ($picExtNames) {
+                $stored = strtolower($m->pic_external ?? '');
+                foreach ($picExtNames as $p) {
+                    if (str_contains($stored, strtolower($p))) return true;
+                }
+                return false;
+            });
         }
         if ($ruanganId = $request->get('ruangan_id')) {
             $tableData = $tableData->filter(fn ($m) => $m->ruangan_id == $ruanganId);

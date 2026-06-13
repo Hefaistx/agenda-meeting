@@ -225,6 +225,7 @@ foreach (\App\Models\Meeting::$picOptions as $pic) {
                                 @endforeach
                             </div>
                         </div>
+                        <input type="hidden" name="divisi_ext" :value="selected.join(',')">
                     </div>
 
                     {{-- PIC Eksternal (muncul setelah divisi dipilih) --}}
@@ -412,6 +413,7 @@ foreach (\App\Models\Meeting::$picOptions as $pic) {
                     <th style="min-width:110px">Ruangan</th>
                     <th style="min-width:140px">PIC Internal</th>
                     <th style="min-width:120px">PIC External</th>
+                    <th style="min-width:80px">Divisi</th>
                     <th style="min-width:90px">Status</th>
                     <th style="width:90px">Aksi</th>
                 </tr>
@@ -496,6 +498,14 @@ foreach (\App\Models\Meeting::$picOptions as $pic) {
                         <span style="color:#9ca3af">-</span>
                         @endif
                     </td>
+                    <td>
+                        @php $divCodes = $m->pic_external ? \App\Models\Meeting::externalPicDivisions($m->pic_external) : []; @endphp
+                        @forelse($divCodes as $dc)
+                            <span class="pic-chip" style="background:#eef2ff;color:#4361ee;font-weight:700">{{ $dc }}</span>
+                        @empty
+                            <span style="color:#9ca3af">–</span>
+                        @endforelse
+                    </td>
                     <td><span class="badge badge-status bg-{{ $m->status_badge }}">{{ $m->status }}</span></td>
                     <td>
                         <div class="d-flex gap-1">
@@ -515,7 +525,7 @@ foreach (\App\Models\Meeting::$picOptions as $pic) {
                 </tr>
                 @empty
                 <tr class="no-results-row">
-                    <td colspan="11" class="text-center">Tidak ada meeting pada bulan ini.</td>
+                    <td colspan="12" class="text-center">Tidak ada meeting pada bulan ini.</td>
                 </tr>
                 @endforelse
             </tbody>
