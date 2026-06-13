@@ -26,21 +26,6 @@
                     @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Lokasi</label>
-                    <input type="text" name="lokasi"
-                           class="form-control @error('lokasi') is-invalid @enderror"
-                           value="{{ old('lokasi', $ruangan->lokasi) }}">
-                    @error('lokasi')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Keterangan</label>
-                    <textarea name="keterangan" rows="2"
-                              class="form-control @error('keterangan') is-invalid @enderror">{{ old('keterangan', $ruangan->keterangan) }}</textarea>
-                    @error('keterangan')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
                 <div class="col-12">
                     <small class="text-muted">
                         Dibuat: {{ $ruangan->created_at->format('d-m-Y H:i') }}

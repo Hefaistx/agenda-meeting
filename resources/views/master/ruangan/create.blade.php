@@ -26,23 +26,6 @@
                     @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Lokasi</label>
-                    <input type="text" name="lokasi"
-                           class="form-control @error('lokasi') is-invalid @enderror"
-                           placeholder="Contoh: Lantai 3, Gedung Utama"
-                           value="{{ old('lokasi') }}">
-                    @error('lokasi')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Keterangan</label>
-                    <textarea name="keterangan" rows="2"
-                              class="form-control @error('keterangan') is-invalid @enderror"
-                              placeholder="Fasilitas, catatan khusus, dll...">{{ old('keterangan') }}</textarea>
-                    @error('keterangan')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
                 <div class="col-12 d-flex gap-2 pt-2" style="border-top:1px solid #e2e8f0;margin-top:4px">
                     <button type="submit" class="btn btn-sm px-4"
                             style="background:#3b5bdb;border-color:#3b5bdb;color:#fff;font-weight:600">
