@@ -16,9 +16,9 @@
     <div class="d-flex gap-2">
         {{-- Reschedule --}}
         @if(!in_array($agenda->status, ['Done']))
-        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
+        <a href="{{ route('agenda.edit', $agenda) }}?mode=reschedule" class="btn btn-sm btn-outline-warning">
             <i class="bi bi-arrow-repeat me-1"></i>Reschedule
-        </button>
+        </a>
         @endif
 
         {{-- Edit --}}
@@ -197,91 +197,6 @@
             </small>
         </div>
 
-    </div>
-</div>
-
-{{-- Reschedule Modal --}}
-<div class="modal fade" id="rescheduleModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header py-2">
-                <h6 class="modal-title">
-                    <i class="bi bi-arrow-repeat me-2" style="color:#f59e0b"></i>Reschedule Meeting
-                </h6>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ route('agenda.reschedule', $agenda) }}">
-                @csrf
-                <div class="modal-body py-3">
-                    <div class="alert alert-warning py-2 mb-3" style="font-size:11.5px">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Jadwal lama: <strong>{{ $agenda->tanggal->format('d M Y') }} · {{ \Carbon\Carbon::parse($agenda->jam_mulai)->format('H:i') }}–{{ \Carbon\Carbon::parse($agenda->jam_selesai)->format('H:i') }}</strong>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label">Tanggal Baru <span class="text-danger">*</span></label>
-                        <input type="date" name="tanggal_baru" class="form-control form-control-sm"
-                               value="{{ $agenda->tanggal->format('Y-m-d') }}" required>
-                    </div>
-
-                    <div class="row g-2 mb-2">
-                        <div class="col-6">
-                            <label class="form-label">Jam Mulai <span class="text-danger">*</span></label>
-                            <input type="time" name="jam_mulai_baru" class="form-control form-control-sm"
-                                   value="{{ \Carbon\Carbon::parse($agenda->jam_mulai)->format('H:i') }}" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Jam Selesai <span class="text-danger">*</span></label>
-                            <input type="time" name="jam_selesai_baru" class="form-control form-control-sm"
-                                   value="{{ \Carbon\Carbon::parse($agenda->jam_selesai)->format('H:i') }}" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label">Ruangan</label>
-                        <select name="ruangan_id" class="form-select form-select-sm">
-                            <option value="">— Pilih Ruangan —</option>
-                            @foreach(\App\Models\Room::orderBy('nama')->get() as $r)
-                            <option value="{{ $r->id }}" {{ $agenda->ruangan_id == $r->id ? 'selected' : '' }}>
-                                {{ $r->nama }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label">PIC Internal</label>
-                        @include('partials.pic-dropdown', [
-                            'name'     => 'pic_internal',
-                            'options'  => \App\Models\Meeting::$picOptions,
-                            'labels'   => \App\Models\Meeting::$picLabels,
-                            'selected' => array_filter(array_map('trim', explode(',', $agenda->pic_internal ?? ''))),
-                        ])
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label">PIC Eksternal</label>
-                        @include('partials.pic-external-dropdown', [
-                            'name'     => 'pic_external',
-                            'selected' => array_filter(array_map('trim', explode(',', $agenda->pic_external ?? ''))),
-                        ])
-                    </div>
-
-                    <div class="mb-0">
-                        <label class="form-label">Alasan <span class="text-muted" style="font-size:11px">(opsional)</span></label>
-                        <input type="text" name="alasan" class="form-control form-control-sm"
-                               placeholder="Mis: konflik jadwal, ruangan tidak tersedia...">
-                    </div>
-                </div>
-                <div class="modal-footer py-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-sm"
-                            style="background:#f59e0b;border-color:#f59e0b;color:#fff;font-weight:600">
-                        <i class="bi bi-check-lg me-1"></i>Simpan Reschedule
-                    </button>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 

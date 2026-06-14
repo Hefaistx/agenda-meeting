@@ -1,21 +1,35 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Agenda Meeting')
-@section('breadcrumb', 'IT > Agenda Meeting > Edit')
+@php $isReschedule = request('mode') === 'reschedule'; @endphp
+
+@section('title', $isReschedule ? 'Reschedule Meeting' : 'Edit Agenda Meeting')
+@section('breadcrumb', 'IT > Agenda Meeting > ' . ($isReschedule ? 'Reschedule' : 'Edit'))
 
 @section('content')
 
 <div class="page-hdr">
-    <h4><i class="bi bi-calendar-check me-2" style="color:var(--teal)"></i>Edit Agenda Meeting</h4>
-    <a href="{{ route('agenda.index') }}" class="btn btn-sm btn-outline-secondary">
+    <h4>
+        <i class="bi bi-{{ $isReschedule ? 'arrow-repeat' : 'calendar-check' }} me-2"
+           style="color:{{ $isReschedule ? '#f59e0b' : 'var(--teal)' }}"></i>
+        {{ $isReschedule ? 'Reschedule Meeting' : 'Edit Agenda Meeting' }}
+    </h4>
+    <a href="{{ route('agenda.show', $agenda) }}" class="btn btn-sm btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Kembali
     </a>
 </div>
 
+@if($isReschedule)
+<div class="alert alert-warning py-2 mb-3" style="font-size:12px">
+    <i class="bi bi-info-circle me-1"></i>
+    Jadwal lama: <strong>{{ $agenda->tanggal->format('d M Y') }} · {{ \Carbon\Carbon::parse($agenda->jam_mulai)->format('H:i') }}–{{ \Carbon\Carbon::parse($agenda->jam_selesai)->format('H:i') }}</strong>
+</div>
+@endif
+
 <div class="card">
     <div class="card-body pt-3">
-            <form method="POST" action="{{ route('agenda.update', $agenda) }}">
-                @csrf @method('PUT')
+            <form method="POST" action="{{ $isReschedule ? route('agenda.reschedule', $agenda) : route('agenda.update', $agenda) }}">
+                @csrf
+                @if(!$isReschedule) @method('PUT') @endif
                 <div class="row g-3">
 
                     {{-- Tanggal --}}
@@ -288,13 +302,30 @@
                         </small>
                     </div>
 
+                    @if($isReschedule)
+                    <div class="col-12">
+                        <label class="form-label">Alasan Reschedule <span class="text-muted" style="font-size:11px">(opsional)</span></label>
+                        <input type="text" name="alasan" class="form-control @error('alasan') is-invalid @enderror"
+                               placeholder="Mis: konflik jadwal, ruangan tidak tersedia..."
+                               value="{{ old('alasan') }}">
+                        @error('alasan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    @endif
+
                     <div class="col-12 d-flex gap-2 pt-2"
                          style="border-top:1px solid #e2e8f0;margin-top:4px">
+                        @if($isReschedule)
+                        <button type="submit" class="btn btn-sm px-4"
+                                style="background:#f59e0b;border-color:#f59e0b;color:#fff;font-weight:600">
+                            <i class="bi bi-arrow-repeat me-1"></i>Simpan Reschedule
+                        </button>
+                        @else
                         <button type="submit" class="btn btn-sm px-4"
                                 style="background:#3b5bdb;border-color:#3b5bdb;color:#fff;font-weight:600">
                             Submit
                         </button>
-                        <a href="{{ route('agenda.index') }}" class="btn btn-sm px-4"
+                        @endif
+                        <a href="{{ route('agenda.show', $agenda) }}" class="btn btn-sm px-4"
                            style="background:#e03131;border-color:#e03131;color:#fff;font-weight:600">
                             Cancel
                         </a>

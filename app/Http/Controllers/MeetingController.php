@@ -254,18 +254,22 @@ class MeetingController extends Controller
 
     public function reschedule(Request $request, Meeting $agenda): RedirectResponse
     {
-        $request->validate([
-            'tanggal_baru'     => 'required|date',
-            'jam_mulai_baru'   => 'required',
-            'jam_selesai_baru' => 'required',
-            'alasan'           => 'nullable|string|max:255',
-            'pic_internal'     => 'nullable|string',
-            'pic_external'     => 'nullable|string',
-            'ruangan_id'       => 'nullable|exists:rooms,id',
+        $validated = $request->validate([
+            'tanggal'      => 'required|date',
+            'jam_mulai'    => 'required',
+            'jam_selesai'  => 'required',
+            'ruangan_id'   => 'required|exists:rooms,id',
+            'topik_id'     => 'nullable|exists:topics,id',
+            'kategori'     => 'required|string|max:100',
+            'kegiatan'     => 'required|string',
+            'pic_internal' => 'nullable|string',
+            'pic_external' => 'nullable|string',
+            'hasil'        => 'nullable|string',
+            'alasan'       => 'nullable|string|max:255',
         ]);
 
-        if ($request->jam_selesai_baru <= $request->jam_mulai_baru) {
-            return back()->with('error', 'Jam selesai harus setelah jam mulai.');
+        if ($validated['jam_selesai'] <= $validated['jam_mulai']) {
+            return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
         $history   = $agenda->reschedule_history ?? [];
@@ -273,23 +277,27 @@ class MeetingController extends Controller
             'dari_tanggal'     => $agenda->tanggal->format('Y-m-d'),
             'dari_jam_mulai'   => Carbon::parse($agenda->jam_mulai)->format('H:i'),
             'dari_jam_selesai' => Carbon::parse($agenda->jam_selesai)->format('H:i'),
-            'ke_tanggal'       => $request->tanggal_baru,
-            'ke_jam_mulai'     => $request->jam_mulai_baru,
-            'ke_jam_selesai'   => $request->jam_selesai_baru,
-            'alasan'           => $request->alasan,
+            'ke_tanggal'       => $validated['tanggal'],
+            'ke_jam_mulai'     => $validated['jam_mulai'],
+            'ke_jam_selesai'   => $validated['jam_selesai'],
+            'alasan'           => $validated['alasan'] ?? null,
             'rescheduled_by'   => $this->simUser()['name'],
             'rescheduled_at'   => now('Asia/Jakarta')->format('Y-m-d H:i'),
         ];
 
         $agenda->update([
-            'tanggal'            => $request->tanggal_baru,
-            'jam_mulai'          => $request->jam_mulai_baru,
-            'jam_selesai'        => $request->jam_selesai_baru,
+            'tanggal'            => $validated['tanggal'],
+            'jam_mulai'          => $validated['jam_mulai'],
+            'jam_selesai'        => $validated['jam_selesai'],
+            'ruangan_id'         => $validated['ruangan_id'] ?: null,
+            'topik_id'           => $validated['topik_id'] ?: null,
+            'kategori'           => $validated['kategori'],
+            'kegiatan'           => $validated['kegiatan'],
+            'pic_internal'       => $validated['pic_internal'],
+            'pic_external'       => $validated['pic_external'],
+            'hasil'              => $validated['hasil'],
             'status'             => 'Rescheduled',
             'reschedule_history' => $history,
-            'pic_internal'       => $request->pic_internal,
-            'pic_external'       => $request->pic_external,
-            'ruangan_id'         => $request->ruangan_id ?: null,
         ]);
 
         return redirect()->route('agenda.index')
