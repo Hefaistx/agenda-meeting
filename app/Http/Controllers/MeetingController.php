@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KonfigurasiWaktu;
 use App\Models\Meeting;
 use App\Models\Room;
 use App\Models\Topic;
@@ -18,6 +19,24 @@ class MeetingController extends Controller
     private function simUser(): array
     {
         return session('sim_user', Meeting::$accounts[0]);
+    }
+
+    private function checkWaktuKonfig(string $kategori, string $jamMulai, string $jamSelesai): ?string
+    {
+        $konfig = KonfigurasiWaktu::where('kategori', $kategori)->first();
+        if (! $konfig) return null;
+
+        if ($konfig->waktu_mulai_min && $jamMulai < $konfig->waktu_mulai_min) {
+            $min = substr($konfig->waktu_mulai_min, 0, 5);
+            return "Meeting kategori {$kategori} tidak bisa dimulai sebelum pukul {$min}.";
+        }
+
+        if ($konfig->waktu_selesai_max && $jamSelesai > $konfig->waktu_selesai_max) {
+            $max = substr($konfig->waktu_selesai_max, 0, 5);
+            return "Meeting kategori {$kategori} harus selesai sebelum atau tepat pukul {$max}.";
+        }
+
+        return null;
     }
 
     private function checkPicConflict(Request $request, ?int $excludeId = null): ?string
@@ -170,6 +189,10 @@ class MeetingController extends Controller
             return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
+        if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
+            return back()->withInput()->withErrors(['jam_mulai' => $err]);
+        }
+
         if ($err = $this->checkPicConflict($request)) {
             return back()->withInput()->withErrors(['pic_internal' => $err]);
         }
@@ -224,6 +247,10 @@ class MeetingController extends Controller
             return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
+        if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
+            return back()->withInput()->withErrors(['jam_mulai' => $err]);
+        }
+
         if ($err = $this->checkPicConflict($request, $agenda->id)) {
             return back()->withInput()->withErrors(['pic_internal' => $err]);
         }
@@ -270,6 +297,10 @@ class MeetingController extends Controller
 
         if ($validated['jam_selesai'] <= $validated['jam_mulai']) {
             return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
+        }
+
+        if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
+            return back()->withInput()->withErrors(['jam_mulai' => $err]);
         }
 
         $history   = $agenda->reschedule_history ?? [];
