@@ -185,16 +185,18 @@ class MeetingController extends Controller
             'hasil'        => 'nullable|string',
         ]);
 
+        $backToCreate = fn($errors) => redirect()->route('agenda.create')->withInput()->withErrors($errors);
+
         if ($validated['jam_selesai'] <= $validated['jam_mulai']) {
-            return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
+            return $backToCreate(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
         if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
-            return back()->withInput()->withErrors(['jam_mulai' => $err]);
+            return $backToCreate(['jam_mulai' => $err]);
         }
 
         if ($err = $this->checkPicConflict($request)) {
-            return back()->withInput()->withErrors(['pic_internal' => $err]);
+            return $backToCreate(['pic_internal' => $err]);
         }
 
         $initial   = $validated['kategori'] === 'Internal' ? 'INT' : 'EXT';
@@ -243,16 +245,18 @@ class MeetingController extends Controller
             'hasil'        => 'nullable|string',
         ]);
 
+        $backToEdit = fn($errors) => redirect()->route('agenda.edit', $agenda)->withInput()->withErrors($errors);
+
         if ($validated['jam_selesai'] <= $validated['jam_mulai']) {
-            return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
+            return $backToEdit(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
         if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
-            return back()->withInput()->withErrors(['jam_mulai' => $err]);
+            return $backToEdit(['jam_mulai' => $err]);
         }
 
         if ($err = $this->checkPicConflict($request, $agenda->id)) {
-            return back()->withInput()->withErrors(['pic_internal' => $err]);
+            return $backToEdit(['pic_internal' => $err]);
         }
 
         $agenda->update($validated);
@@ -295,12 +299,14 @@ class MeetingController extends Controller
             'alasan'       => 'nullable|string|max:255',
         ]);
 
+        $backToEdit = fn($errors) => redirect()->route('agenda.edit', $agenda)->withInput()->withErrors($errors);
+
         if ($validated['jam_selesai'] <= $validated['jam_mulai']) {
-            return back()->withInput()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
+            return $backToEdit(['jam_selesai' => 'Jam selesai harus setelah jam mulai.']);
         }
 
         if ($err = $this->checkWaktuKonfig($validated['kategori'], $validated['jam_mulai'], $validated['jam_selesai'])) {
-            return back()->withInput()->withErrors(['jam_mulai' => $err]);
+            return $backToEdit(['jam_mulai' => $err]);
         }
 
         $history   = $agenda->reschedule_history ?? [];
