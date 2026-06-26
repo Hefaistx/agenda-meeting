@@ -420,6 +420,12 @@
                 <i class="bi bi-tags"></i>Topik
             </a>
         </li>
+        <li>
+            <a href="{{ route('konfigurasi-waktu.index') }}"
+               class="{{ request()->routeIs('konfigurasi-waktu.*') ? 'active' : '' }}">
+                <i class="bi bi-clock"></i>Konfigurasi Waktu
+            </a>
+        </li>
     </ul>
 
     {{-- ── Simulasi Login ── --}}
@@ -536,13 +542,25 @@
         <div style="height:3px;background:#dc2626;border-radius:0 0 10px 10px"></div>
     </div>
     @endif
+    @if(session('info'))
+    <div id="toastInfo" class="toast align-items-center border-0 shadow"
+         role="alert" style="background:#fff;min-width:300px;border-radius:10px">
+        <div class="d-flex align-items-center gap-3 px-3 py-3">
+            <div style="width:34px;height:34px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="bi bi-info-circle-fill" style="color:#2563eb;font-size:17px"></i>
+            </div>
+            <div style="font-size:13px;color:#1f2937;font-weight:500">{{ session('info') }}</div>
+        </div>
+        <div style="height:3px;background:#2563eb;border-radius:0 0 10px 10px"></div>
+    </div>
+    @endif
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    ['toastSuccess', 'toastError'].forEach(function (id) {
+    ['toastSuccess', 'toastError', 'toastInfo'].forEach(function (id) {
         var el = document.getElementById(id)
         if (el) {
             new bootstrap.Toast(el, { delay: 3500, autohide: true }).show()

@@ -5,6 +5,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\SimulasiController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\KonfigurasiWaktuController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\TopikController;
 
@@ -18,6 +19,7 @@ Route::patch('agenda/{agenda}/cancel', [MeetingController::class, 'cancel'])->na
 
 Route::resource('ruangan', RuanganController::class);
 Route::resource('topik', TopikController::class);
+Route::resource('konfigurasi-waktu', KonfigurasiWaktuController::class);
 
 Route::get('kalender', [KalenderController::class, 'index'])->name('kalender.index');
 
